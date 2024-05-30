@@ -27,3 +27,11 @@ exports.deleteTour = (req, res) => {
     message: "This Route is not yet implemented",
   });
 };
+
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price)
+    return res.status(400).json({
+      message: "Invalid Data",
+    });
+  next();
+};
