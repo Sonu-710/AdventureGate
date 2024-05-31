@@ -54,14 +54,33 @@ exports.createTour = async (req, res) => {
   }
 };
 
-exports.updateTour = (req, res) => {
-  res.status(500).json({
-    message: "This Route is not yet implemented",
-  });
+exports.updateTour = async (req, res) => {
+  try {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: "success",
+      data: {
+        tour: tour,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      data: err,
+    });
+  }
 };
 
-exports.deleteTour = (req, res) => {
-  res.status(500).json({
-    message: "This Route is not yet implemented",
-  });
+exports.deleteTour = async (req, res) => {
+  try {
+    
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      data: err,
+    });
+  }
 };
