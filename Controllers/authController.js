@@ -65,5 +65,14 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role))
+      return next(
+        new Error("You don't have access to perfrom this action", 403)
+      );
+      next();
+  };
+};
 //To-do
 //Test the password changed Property
