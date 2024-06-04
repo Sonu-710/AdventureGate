@@ -1,3 +1,4 @@
+const { promisify } = require("util");
 const User = require("./../Models/users");
 const catchAsync = require("./../utils/CatchAsync.js");
 const AppError = require("./../utils/AppError");
@@ -38,3 +39,31 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  if (!token) {
+    return next(new AppError("You are not logged in", 401));
+  }
+
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  const user = await User.findById(decoded.id);
+  if (!user) return next(new AppError("The user no longer exists", 401));
+
+  if (user.changedPasswordAfter(decoded.iat))
+    return next(
+      new AppError("User recently changed password.Please login again", 401)
+    );
+
+  req.user = user;
+  next();
+});
+
+//To-do
+//Test the password changed Property
