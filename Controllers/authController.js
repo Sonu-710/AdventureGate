@@ -11,16 +11,17 @@ const signToken = (id) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
-exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body);
-  const token = signToken(newUser.id);
-  res.status(201).json({
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
     status: "success",
     token,
-    data: {
-      user: newUser,
-    },
   });
+};
+exports.signup = catchAsync(async (req, res, next) => {
+  const newUser = await User.create(req.body);
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -34,11 +35,8 @@ exports.login = catchAsync(async (req, res, next) => {
 
   if (!user || !(await user.correctPassword(password, user.password)))
     return next(new AppError("Invalid email or password"), 401);
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -109,6 +107,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     );
   }
 });
+
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
@@ -128,13 +127,26 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
+exports.updateMyPassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select("+password");
 
+  if (!req.body.currentPassword || !req.body.passwordConfirm || !req.body.newPassword)
+    return next(new AppError("Invalid Input", 404));
+
+  const isPasswordCorrect = await user.correctPassword(
+    req.body.currentPassword,
+    user.password
+  );
+  if (!isPasswordCorrect) return next(new AppError("Invalid password", 401));
+
+  user.password = req.body.newPassword;
+  user.passwordConfirm = req.body.passwordConfirm;
+
+  await user.save();
+  createSendToken(user, 200, res);
+});
 //To-do
 //Test the password changed Property
