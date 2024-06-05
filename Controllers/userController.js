@@ -54,8 +54,15 @@ exports.updateUser = (req, res) => {
   });
 };
 
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    message: "This Route is not yet implemented",
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(req.user._id, { active: false });
+  console.log(user);
+  if (!user) {
+    return next(new AppError("Something wrong"));
+  }
+
+  res.status(204).json({
+    status: "success",
+    data: null,
   });
-};
+});
