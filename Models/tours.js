@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
-const validator=require('validator');
+const validator = require("validator");
 
 const tourSchema = new mongoose.Schema(
   {
@@ -24,7 +24,7 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       enum: {
-        values: ["easy", "meduim", "difficult"],
+        values: ["easy", "medium", "difficult"],
         message: "Diffculty can only be easy,meduim or difficult",
       },
       required: [true, "A tour must have a difficulty"],
@@ -81,6 +81,35 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -102,6 +131,14 @@ tourSchema.pre("save", function (next) {
 //QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v",
+  });
   next();
 });
 

@@ -3,7 +3,6 @@ const APIFeatures = require("./../utils/APIFeatures");
 const catchAsync = require("./../utils/CatchAsync.js");
 const AppError = require("./../utils/AppError");
 
-
 exports.getAllTours = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
@@ -23,7 +22,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tours = await Tour.findById(req.params.id);
+  const tours = await Tour.findById(req.params.id)
   if (!tours) {
     return next(new AppError("No tour found with that ID", 404));
   }
