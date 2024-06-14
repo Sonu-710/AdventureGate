@@ -49,11 +49,7 @@ exports.createUser = (req, res) => {
   });
 };
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    message: "This Route is not yet implemented",
-  });
-};
+exports.updateUser = factory.updateOne(User);
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(req.user._id, { active: false });
