@@ -2,6 +2,38 @@ const Tour = require("./../Models/tours.js");
 const catchAsync = require("./../utils/CatchAsync.js");
 const AppError = require("./../utils/AppError");
 const factory = require("./handlerFactory");
+const multer = require("multer");
+const sharp = require("sharp");
+
+const multerStorage = multer.memoryStorage();
+const multerFilter = (req, file, cb) => {
+  if ((file, file.mimetype.startsWith("image"))) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Not an image! Please upload only image"), false);
+  }
+};
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadTourImages = upload.fields([
+  {name:'imageCover',maxCount:1},
+  {name:'images',maxCount:3}
+]);
+
+exports.resizeUserPhoto = (req, res, next) => {
+  if (!req.file) return next();
+  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.file.filename}`);
+  next();
+};
+
 
 exports.getAllTours = factory.getAll(Tour);
 exports.getTour = factory.getOne(Tour, { path: "reviews" });
