@@ -13,6 +13,7 @@ const app = express();
 const tourRouter = require("./Routes/tours");
 const userRouter = require("./Routes/users");
 const reviewRouter = require("./Routes/review");
+const bookingRouter=require('./Routes/booking')
 
 //MIDDLEWARES
 app.use(helmet());
@@ -48,6 +49,7 @@ app.use(express.static("public"));
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/booking", bookingRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
