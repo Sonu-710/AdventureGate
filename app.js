@@ -7,14 +7,19 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
+const path = require("path");
 
 const app = express();
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+
+app.use(express.static(path.join(__dirname, "public")));
 
 const tourRouter = require("./Routes/tours");
 const userRouter = require("./Routes/users");
 const reviewRouter = require("./Routes/review");
-const bookingRouter=require('./Routes/booking')
-
+const bookingRouter = require("./Routes/booking");
+const viewRouter = require("./Routes/views");
 //MIDDLEWARES
 app.use(helmet());
 
@@ -43,13 +48,12 @@ app.use(
   })
 );
 
-app.use(express.static("public"));
-
 //ROUTES
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/booking", bookingRouter);
+app.use("/", viewRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
