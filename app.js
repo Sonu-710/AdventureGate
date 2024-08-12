@@ -8,6 +8,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const path = require("path");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 app.set("view engine", "pug");
@@ -20,7 +21,7 @@ const userRouter = require("./Routes/users");
 const reviewRouter = require("./Routes/review");
 const bookingRouter = require("./Routes/booking");
 const viewRouter = require("./Routes/views");
-//MIDDLEWARES
+
 app.use(helmet());
 
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
@@ -31,6 +32,8 @@ const limiter = rateLimit({
   message: "Too many request from this IP.Please try agian after some time",
 });
 app.use("/api", limiter);
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json({ limit: "10kb" }));
 app.use(mongoSanitize());
