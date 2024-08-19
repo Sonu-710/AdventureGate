@@ -34,14 +34,14 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
-exports.signup = catchAsync(async (req, res, next) => {
+exports.signup = async (req, res, next) => {
   const newUser = await User.create(req.body);
   const url = `${req.protocol}://${req.get("host")}/me`;
   console.log(url);
   console.log(newUser.name.split(" "));
   await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
-});
+};
 
 exports.login = catchAsync(async (req, res, next) => {
   const email = req.body.email;
@@ -196,11 +196,11 @@ exports.isLoggedIn = async (req, res, next) => {
 };
 
 exports.logout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
+  res.cookie("jwt", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
   });
-  res.status(200).json({ status: 'success' });
+  res.status(200).json({ status: "success" });
 };
 
 //To-do
