@@ -11,6 +11,19 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 
 const app = express();
+
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       scriptSrc: ["'self'", "https://checkout.razorpay.com"],
+//       connectSrc: ["'self'", "ws://127.0.0.1:*"],
+//       fontSrc: ["'self'", "https://fonts.gstatic.com"],
+//       styleSrc: ["'self'", "https://fonts.googleapis.com"],
+//     },
+//   })
+// );
+
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 
@@ -21,8 +34,6 @@ const userRouter = require("./Routes/users");
 const reviewRouter = require("./Routes/review");
 const bookingRouter = require("./Routes/booking");
 const viewRouter = require("./Routes/views");
-
-app.use(helmet());
 
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
