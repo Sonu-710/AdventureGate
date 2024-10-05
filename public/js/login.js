@@ -1,10 +1,9 @@
 const showAlert = (type, msg) => {
   hideAlert();
   const markup = `<div class="alert alert--${type}">${msg}</div>`;
-  document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
+  document.querySelector("body").insertAdjacentHTML("afterbegin", markup);
   window.setTimeout(hideAlert, 5000);
 };
-
 
 const loginForm = document.querySelector(".form--login");
 const logoutBtn = document.querySelector(".nav__el--logout");
@@ -19,7 +18,7 @@ if (loginForm) {
 }
 
 const hideAlert = () => {
-  const el = document.querySelector('.alert');
+  const el = document.querySelector(".alert");
   if (el) el.parentElement.removeChild(el);
 };
 
@@ -41,7 +40,8 @@ export const login = async (email, password) => {
       }, 1500);
     }
   } catch (err) {
-    showAlert("error", err);
+    console.log(err);
+    showAlert("error", err.response.data.message);
   }
 };
 
@@ -53,7 +53,6 @@ export const logout = async () => {
     });
     if (res.data.status === "success") location.reload(true);
   } catch (err) {
-    console.log(err.response);
     showAlert("error", "Error logging out! Try again.");
   }
 };
